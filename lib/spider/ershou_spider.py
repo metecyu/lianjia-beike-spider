@@ -150,5 +150,74 @@ class ErShouSpider(BaseSpider):
         print("Total cost {0} second to crawl {1} data items.".format(t2 - t1, self.total_num))
 
 
+    @staticmethod
+    def get_xiaoqu_ershou_info(city_name, xiaoqu_id):
+        """
+        通过爬取页面获得城市指定版块的二手房信息
+        :param city_name: 城市
+        :param area_name: 版块
+        :return: 二手房数据列表
+        """
+        total_page = 1
+        district_name ="" #area_dict.get(area_name, "")
+        # 中文区县
+        chinese_district = get_chinese_district(district_name)
+        # 中文版块
+        chinese_area ="" # chinese_area_dict.get(area_name, "")
+
+        ershou_list = list()
+        page = 'http://{0}.{1}.com/ershoufang/{2}/'.format(city_name, SPIDER_NAME, xiaoqu_id)
+        print(page)  # 打印版块页面地址
+        headers = create_headers()
+        response = requests.get(page, timeout=10, headers=headers)
+        html = response.content
+        soup = BeautifulSoup(html, "lxml")
+
+        # 获得总的页数，通过查找总页码的元素信息
+        try:
+            page_box = soup.find_all('div', class_='page-box')[0]
+            matches = re.search('.*"totalPage":(\d+),.*', str(page_box))
+            total_page = int(matches.group(1))
+        except Exception as e:
+            print("\tWarning: only find one page for {0}".format(xiaoqu_id))
+            print(e)
+
+        # 从第一页开始,一直遍历到最后一页
+        for num in range(1, total_page + 1):
+            page = 'http://{0}.{1}.com/ershoufang/{2}/pg{3}'.format(city_name, SPIDER_NAME, xiaoqu_id, num)
+            print(page)  # 打印每一页的地址
+            headers = create_headers()
+            BaseSpider.random_delay()
+            response = requests.get(page, timeout=10, headers=headers)
+            html = response.content
+            soup = BeautifulSoup(html, "lxml")
+
+            xiaoquDiv =  soup.find_all('div', class_="name")
+            xiaoquDiv = xiaoquDiv.text.strip()
+
+            # 获得有小区信息的panel
+            house_elements = soup.find_all('li', class_="clear")
+            for house_elem in house_elements:
+                test = house_elem.find('div', class_="positionInfo")
+                price = house_elem.find('div', class_="totalPrice")
+                name = house_elem.find('div', class_='title')
+                desc = house_elem.find('div', class_="houseInfo")
+                pic = house_elem.find('a', class_="img").find('img', class_="lj-lazy")
+
+                # 继续清理数据
+                test = test.text.strip()
+                price = price.text.strip()
+                name = name.text.replace("\n", "")
+                desc = desc.text.replace("\n", "").strip()
+                pic = pic.get('data-original').strip()
+                # print(pic)
+
+
+                # 作为对象保存
+                ershou = ErShou(chinese_district, chinese_area, name, price, desc, pic)
+                ershou_list.append(ershou)
+        return ershou_list
+
+
 if __name__ == '__main__':
     pass

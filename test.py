@@ -8,5 +8,8 @@ from lib.spider.ershou_spider import *
 
 if __name__ == "__main__":
     spider = ErShouSpider(SPIDER_NAME)
-    spider.start()
+    # spider.get_xiaoqu_ershou_info("sh","beicai");
+    ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000002853");
+    print(ershou_list)
+
 
