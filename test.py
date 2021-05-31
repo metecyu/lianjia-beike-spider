@@ -10,6 +10,12 @@ if __name__ == "__main__":
     spider = ErShouSpider(SPIDER_NAME)
     # spider.get_xiaoqu_ershou_info("sh","beicai");
     ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000002853");
-    print(ershou_list)
+    spider.get_xiaoqu_roomNum("南山雨果（公寓）",ershou_list)
+
+    ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000004989");
+    spider.get_xiaoqu_roomNum("中金海棠苑（一期）", ershou_list)
+
+
+    #print(ershou_list)
 
 

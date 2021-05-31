@@ -193,7 +193,7 @@ class ErShouSpider(BaseSpider):
             soup = BeautifulSoup(html, "lxml")
 
             xiaoquDiv =  soup.find_all('div', class_="name")
-            xiaoquDiv = xiaoquDiv.text.strip()
+          #  xiaoquDiv = xiaoquDiv.text.strip()
 
             # 获得有小区信息的panel
             house_elements = soup.find_all('li', class_="clear")
@@ -217,6 +217,26 @@ class ErShouSpider(BaseSpider):
                 ershou = ErShou(chinese_district, chinese_area, name, price, desc, pic)
                 ershou_list.append(ershou)
         return ershou_list
+
+    @staticmethod
+    def get_xiaoqu_roomNum( xiaoquName,ershou_list):
+        oneRoom = 0
+        twoRoom = 0
+        threeRoom = 0
+        fourRoom = 0
+        for house_elem in ershou_list:
+            roomNum = house_elem.desc[0:1]
+            if roomNum == '1':
+                oneRoom = oneRoom + 1
+            elif roomNum == '2':
+                twoRoom = twoRoom + 1
+            elif roomNum == '3':
+                threeRoom = threeRoom + 1
+            elif roomNum == '4':
+                fourRoom = fourRoom+1
+            else:
+                print('')
+        print("{0}共{1}套，  {2}，{3}，{4}，{5}".format(xiaoquName,len(ershou_list),oneRoom, twoRoom, threeRoom,fourRoom))
 
 
 if __name__ == '__main__':
