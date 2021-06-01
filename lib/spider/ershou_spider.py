@@ -167,7 +167,7 @@ class ErShouSpider(BaseSpider):
 
         ershou_list = list()
         page = 'http://{0}.{1}.com/ershoufang/{2}/'.format(city_name, SPIDER_NAME, xiaoqu_id)
-        print(page)  # 打印版块页面地址
+        # print(page)  # 打印版块页面地址
         headers = create_headers()
         response = requests.get(page, timeout=10, headers=headers)
         html = response.content
@@ -185,7 +185,7 @@ class ErShouSpider(BaseSpider):
         # 从第一页开始,一直遍历到最后一页
         for num in range(1, total_page + 1):
             page = 'http://{0}.{1}.com/ershoufang/{2}/pg{3}'.format(city_name, SPIDER_NAME, xiaoqu_id, num)
-            print(page)  # 打印每一页的地址
+            # print(page)  # 打印每一页的地址
             headers = create_headers()
             BaseSpider.random_delay()
             response = requests.get(page, timeout=10, headers=headers)
@@ -234,9 +234,8 @@ class ErShouSpider(BaseSpider):
                 threeRoom = threeRoom + 1
             elif roomNum == '4':
                 fourRoom = fourRoom+1
-            else:
-                print('')
-        print("{0}共{1}套，  {2}，{3}，{4}，{5}".format(xiaoquName,len(ershou_list),oneRoom, twoRoom, threeRoom,fourRoom))
+
+        print("{0}共 {1} 套，1室~4室 {2}，{3}，{4}，{5}".format(xiaoquName,len(ershou_list),oneRoom, twoRoom, threeRoom,fourRoom))
 
 
 if __name__ == '__main__':
