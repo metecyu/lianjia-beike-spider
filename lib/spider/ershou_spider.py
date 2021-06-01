@@ -8,6 +8,7 @@ import re
 import threadpool
 from bs4 import BeautifulSoup
 from lib.item.ershou import *
+from lib.item.ershouDetail import *
 from lib.zone.city import get_city
 from lib.spider.base_spider import *
 from lib.utility.date import *
@@ -214,28 +215,81 @@ class ErShouSpider(BaseSpider):
 
 
                 # 作为对象保存
-                ershou = ErShou(chinese_district, chinese_area, name, price, desc, pic)
+                ershou = ErShouDetail(chinese_district, chinese_area, name, price, desc, pic)
                 ershou_list.append(ershou)
         return ershou_list
 
     @staticmethod
     def get_xiaoqu_roomNum( xiaoquName,ershou_list):
-        oneRoom = 0
-        twoRoom = 0
-        threeRoom = 0
-        fourRoom = 0
+        oneRoomSum = 0
+        twoRoomSum = 0
+        threeRoomSum = 0
+        fourRoomSum = 0
+        floorLevel23Sum = 0
         for house_elem in ershou_list:
-            roomNum = house_elem.desc[0:1]
+            roomNum = house_elem.roomNum
             if roomNum == '1':
-                oneRoom = oneRoom + 1
+                oneRoomSum = oneRoomSum + 1
             elif roomNum == '2':
-                twoRoom = twoRoom + 1
+                twoRoomSum = twoRoomSum + 1
             elif roomNum == '3':
-                threeRoom = threeRoom + 1
+                threeRoomSum = threeRoomSum + 1
             elif roomNum == '4':
-                fourRoom = fourRoom+1
+                fourRoomSum = fourRoomSum+1
+            # 中高层数量
+            if (house_elem.roomFloorLevel == 2) :
+                floorLevel23Sum = floorLevel23Sum + 1
+            if (house_elem.roomFloorLevel == 3):
+                floorLevel23Sum = floorLevel23Sum + 1
+        # 中高
+        print("{0}共: {1} 套，1室~4室户数:  {2}，{3}，{4}，{5} ,中高层户数:{6} ".format(xiaoquName,len(ershou_list),oneRoomSum, twoRoomSum, threeRoomSum,fourRoomSum,floorLevel23Sum))
 
-        print("{0}共 {1} 套，1室~4室 {2}，{3}，{4}，{5}".format(xiaoquName,len(ershou_list),oneRoom, twoRoom, threeRoom,fourRoom))
+
+    @staticmethod
+    def get_ershou_total(city_name,roomNum):
+        """
+        通过爬取页面获得城市指定版块的二手房信息
+        :param city_name: 城市
+        :param area_name: 版块
+        :return: 二手房数据列表
+        """
+        total_page = 1
+        district_name ="" #area_dict.get(area_name, "")
+        # 中文区县
+        chinese_district = get_chinese_district(district_name)
+        # 中文版块
+        chinese_area ="" # chinese_area_dict.get(area_name, "")
+
+        ershou_list = list()
+        if roomNum==1:
+            page = 'http://{0}.{1}.com/ershoufang/l1'.format(city_name, SPIDER_NAME)
+        elif roomNum == 2:
+            page = 'http://{0}.{1}.com/ershoufang/l2'.format(city_name, SPIDER_NAME)
+        elif roomNum == 3:
+            page = 'http://{0}.{1}.com/ershoufang/l3'.format(city_name, SPIDER_NAME)
+        elif roomNum == 4:
+            page = 'http://{0}.{1}.com/ershoufang/l4'.format(city_name, SPIDER_NAME)
+        else:
+            page = 'http://{0}.{1}.com/ershoufang/'.format(city_name, SPIDER_NAME)
+        # print(page)  # 打印版块页面地址
+        headers = create_headers()
+        response = requests.get(page, timeout=10, headers=headers)
+        html = response.content
+        soup = BeautifulSoup(html, "lxml")
+
+        xiaoquDiv = soup.find('h2', class_="total")
+        xiaoquDiv = xiaoquDiv.find('span')
+        str = xiaoquDiv.text.strip()
+        return str
+
+    def print_ershou_total(self):
+        ershou_roomAll_sum = self.get_ershou_total("sh",0)
+        ershou_room1_sum = self.get_ershou_total("sh",1)
+        ershou_room2_sum = self.get_ershou_total("sh", 2)
+        ershou_room3_sum = self.get_ershou_total("sh", 3)
+        ershou_room4_sum = self.get_ershou_total("sh", 4)
+
+        print("二手房总量 {0},一室 {1} 套，二室 {2} 套，三室 {3} 套，四室 {4} 套 ".format(ershou_roomAll_sum,ershou_room1_sum,ershou_room2_sum,ershou_room3_sum,ershou_room4_sum) )
 
 
 if __name__ == '__main__':
