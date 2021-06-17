@@ -168,11 +168,17 @@ class ErShouSpider(BaseSpider):
 
         ershou_list = list()
         page = 'http://{0}.{1}.com/ershoufang/{2}/'.format(city_name, SPIDER_NAME, xiaoqu_id)
-        # print(page)  # 打印版块页面地址
+        #print(page)  # 打印版块页面地址
         headers = create_headers()
         response = requests.get(page, timeout=10, headers=headers)
         html = response.content
         soup = BeautifulSoup(html, "lxml")
+
+        # 是否有房源
+        isExistSale = soup.find_all('div', class_='m-noresult')
+        if len(isExistSale) > 0 :
+            return ershou_list
+
 
         # 获得总的页数，通过查找总页码的元素信息
         try:

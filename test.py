@@ -11,19 +11,28 @@ if __name__ == "__main__":
 
     spider.print_ershou_total()
 
-
-    spider.get_xiaoqu_ershou_info("sh","beicai");
+    #spider.get_xiaoqu_ershou_info("sh","beicai");
     ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000002853");
     spider.get_xiaoqu_roomNum("南山雨果（公寓）",ershou_list)
 
     ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000004989");
     spider.get_xiaoqu_roomNum("中金海棠苑（一期）", ershou_list)
 
+    ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000004986");
+    spider.get_xiaoqu_roomNum("中金海棠苑（三期）", ershou_list)
+
     ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000019832");
     spider.get_xiaoqu_roomNum("繁荣华庭", ershou_list)
 
     ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011000013690");
     spider.get_xiaoqu_roomNum("金杨五街坊", ershou_list)
+
+    ershou_list = spider.get_xiaoqu_ershou_info("sh", "c5011063588254");
+    spider.get_xiaoqu_roomNum("金融家", ershou_list)
+
+
+
+
 
 
 
